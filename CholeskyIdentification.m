@@ -84,7 +84,8 @@ if(opt)
         for jj=1:n
             k=k+1;
             subplot(n,n,k),plot(1:H,squeeze(cirfdisplay(ii,jj,:)),'k',...
-            1:H,squeeze(prctile(CholBootdisplay(ii,jj,:,:),[16 84],4)),':k'),axis tight
+                1:H,squeeze(prctile(CholBootdisplay(ii,jj,:,:),[5 95],4)),':k'),axis tight
+            %1:H,squeeze(prctile(CholBootdisplay(ii,jj,:,:),[16 84],4)),':k'),axis tight
 
             if ii==1, title(['Shock: ',labels(jj)]); end
             if jj==1, ylabel(labels(ii)); end

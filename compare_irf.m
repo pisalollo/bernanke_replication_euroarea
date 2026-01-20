@@ -1,4 +1,4 @@
-function compare_irf(irf_s,irfboot_s,labels,shocklabels,legends,area_on)
+function compare_irf(irf_s,irfboot_s,labels,shocklabels,legends,area_on,confidence)
 
 
 n_rows=max(size(labels));
@@ -19,7 +19,7 @@ k=0;
 
             if j==n_columns
                 for z=1:n_irf_s
-                    band = squeeze(prctile(irfboot_s{z}(i,1,:,:), [16 84], 4)); 
+                    band = squeeze(prctile(irfboot_s{z}(i,1,:,:), confidence, 4)); 
                     %size(band)
                     
                     lower = squeeze(band(:,1));
@@ -37,7 +37,8 @@ k=0;
                         hold on
                     end
     
-                    plot(1:H,squeeze(prctile(irfboot_s{z}(i,1,:,:), [16 84],4)),'Color', colors(z,:), 'LineStyle', ':','HandleVisibility', 'off')
+                    %plot(1:H,squeeze(prctile(irfboot_s{z}(i,1,:,:), [16 84],4)),'Color', colors(z,:), 'LineStyle', ':','HandleVisibility', 'off')
+                     plot(1:H,squeeze(prctile(irfboot_s{z}(i,1,:,:), confidence,4)),'Color', colors(z,:), 'LineStyle', ':','HandleVisibility', 'off')
                     hold on
                 
                 end
@@ -48,7 +49,7 @@ k=0;
                 yline(0,'k--','HandleVisibility','off')
                 hold off
             else
-                band = squeeze(prctile(irfboot_s{j}(i,1,:,:), [16 84], 4)); 
+                band = squeeze(prctile(irfboot_s{j}(i,1,:,:), confidence, 4)); 
                 size(band)
                     
                 lower = squeeze(band(:,1));
@@ -65,8 +66,8 @@ k=0;
                 Patch = fill(x_area, y_area, colors(j,:), 'FaceAlpha', 0.2, 'EdgeColor', 'none','HandleVisibility','off');
                 hold on
             
-    
-                plot(1:H,squeeze(prctile(irfboot_s{j}(i,1,:,:), [16 84],4)),'Color', colors(j,:), 'LineStyle', ':','HandleVisibility', 'off')
+                plot(1:H,squeeze(prctile(irfboot_s{j}(i,1,:,:), confidence,4)),'Color', colors(j,:), 'LineStyle', ':','HandleVisibility', 'off')
+                %plot(1:H,squeeze(prctile(irfboot_s{j}(i,1,:,:), [16 84],4)),'Color', colors(j,:), 'LineStyle', ':','HandleVisibility', 'off')
                 hold on
                 legend('show')
                 axis tight

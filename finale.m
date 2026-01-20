@@ -5,6 +5,14 @@
 
 clear all;
 close all;
+%confidence=[16 84]; %set confidence to 68
+confidence=[5 95]; %set confidence to 90
+%n_bootstrap = 10000;
+n_bootstrap = 1000;
+
+forcing=1; % Force common lag length
+forced_p=7; %force an "optimal p": if =0 then the common lag lenght is the best p found by AIC on main FAVAR
+
 tic
 
 %% ============================================================
@@ -120,7 +128,7 @@ r_opt_baseline = optimal_r(X_std_baseline,min_var_explained,"Baseline FAVAR");
 %r_opt_baseline=r_opt;
 
 %% ============================================================
-%  FACTOR EXTRACTION – BERNANKE ROTATION
+%  FACTOR EXTRACTION – BERNANKE CLEANING
 %% ============================================================
 
 % Latent factors excluding explicit variables
@@ -130,12 +138,12 @@ r_baseline = r_opt_baseline - 1;
 policy_rate = Y(:,3);
 
 % Factors with policy rate
-Fhat = bernanke_rotation(r,X_std,X_s,policy_rate);
-Fhat_baseline = bernanke_rotation(r_baseline,X_std_baseline,X_s_baseline,policy_rate);
+Fhat = bernanke_cleaning(r,X_std,X_s,policy_rate);
+Fhat_baseline = bernanke_cleaning(r_baseline,X_std_baseline,X_s_baseline,policy_rate);
 
 % Factors with shadow rate
-Fhat_shadowrate = bernanke_rotation(r,X_std,X_s,shadowrate);
-Fhat_baseline_shadowrate = bernanke_rotation(r_baseline,X_std_baseline,X_s_baseline,shadowrate);
+Fhat_shadowrate = bernanke_cleaning(r,X_std,X_s,shadowrate);
+Fhat_baseline_shadowrate = bernanke_cleaning(r_baseline,X_std_baseline,X_s_baseline,shadowrate);
 
 %% ============================================================
 %  STATE VECTORS
@@ -156,19 +164,23 @@ Z_baseline_shadowrate = [Fhat_baseline_shadowrate shadowrate];
 %% ============================================================
 
 p_max = 12;
-
 [optimal_p, para_optimalp, res_optimalp, aic_values, autoreg]= VarOLSbestP(Z,p_max);
 
-forcing=1; % Force common lag length
+
+
 if forcing
-    %optimal_p=4; %forcing p
+    if forced_p>=1
+        optimal_p=forced_p; %forcing p to >=7 to capture reasonable seasonality
+        [para_optimalp,res_optimalp]=VARTopicsOLS(Z,optimal_p);
+    end
     optimal_p_shadowrate=optimal_p;
     optimal_p_baseline=optimal_p;
     optimal_p_baseline_shadowrate=optimal_p;
     optimal_p_var=optimal_p;
-else
+else %robustness test on different p lags for various models
     [optimal_p_baseline, ~, ~, ~, ~]= VarOLSbestP(Z_baseline,p_max);
     [optimal_p_baseline_shadowrate, ~, ~, ~, ~]= VarOLSbestP(Z_baseline_shadowrate,p_max);
+    [optimal_p_shadowrate, ~, ~, ~, ~]= VarOLSbestP(Z_shadowrate,p_max);
     [optimal_p_var, ~, ~, ~, ~]= VarOLSbestP(Y,p_max);
 end
 
@@ -188,7 +200,6 @@ end
 p=optimal_p;
 H = 60;
 constant = 1;
-n_bootstrap = 100;
 cum_index = [];
 display_on = 0;
 
@@ -289,7 +300,7 @@ irf_boot_s{5}([1,2],1,:,:)=irf_boot_s{5}([1,2],1,:,:)*100;
 
 %dispplay comparison
 compare_irf(irf_s,irf_boot_s,var_labels,"Policy Rate shock VAR vs FAVAR (baseline) vs FAVAR(ibrido) vs FAVAR (shadow) vs FAVAR(ibrido e shadow): livelli", ...
-    ["VAR","FAVAR[r+GDP,HICP,PolicyRate","Favar Baseline","Favar Shadow", "Favar baseline shadow"],0);
+    ["VAR","FAVAR[r+GDP,HICP,PolicyRate","Favar Baseline","Favar Shadow", "Favar baseline shadow"],0,confidence);
 
 %% ============================================================
 %  ROBUSTNESS: DIFFERENT NUMBER OF FACTORS
@@ -299,7 +310,7 @@ irf_s_r={};
 irf_s_boot_r={};
 
 for i=1:r
-    [F_r]= bernanke_rotation(i,X_std,X_s,policy_rate);
+    [F_r]= bernanke_cleaning(i,X_std,X_s,policy_rate);
     Z_r = [F_r Y];
 
     [favar_irf_r,~,favar_irf_boot_r,~,~,~] = CholeskyIdentification(Z_r,optimal_p,H,constant,n_bootstrap,[],"",0);
@@ -313,7 +324,7 @@ for i=1:r
 end
 
 %displaying
-compare_irf(irf_s_r,irf_s_boot_r,var_labels,"Favar comparison - various r: from 1 factor + 3 (gdp,hicp,rate) to the optimal computed ( minus the varaibile made explicit)- livelli",[1+3:r+3-1,"optimal R"],0);
+compare_irf(irf_s_r,irf_s_boot_r,var_labels,"Favar comparison - various r: from 1 factor + 3 (gdp,hicp,rate) to the optimal computed ( minus the varaibile made explicit)- livelli",[1+3:r+3-1,"optimal R"],0,confidence);
 
 %% ============================================================
 %  DISPLAYING LOADED IRF MAIN FAVAR
@@ -369,7 +380,7 @@ x=x(:);
 figure()
 for i=1:max(size(labels_disp))
     subplot(4,4,i),
-    band = squeeze(prctile(cum_disp_irf_boot(i,r+3,:,:), [16 84], 4)); 
+    band = squeeze(prctile(cum_disp_irf_boot(i,r+3,:,:), confidence, 4)); 
     lower = squeeze(band(:,1));
     upper = squeeze(band(:,2));
     lower=lower(:);
@@ -413,63 +424,3 @@ uit=uitable(fig,"Data",[labels_disp',Variance_Decomposition,R2'],"ColumnName",["
 
 toc
 return
-
-%%
-
-%window_size = 60; % 10 anni (se dati mensili)
-%[T_total, ~] = size(Fhat);
-%n_windows = T_total - window_size + 1;
-
-% Preallocazione per salvare, ad esempio, la risposta del PIL allo shock Tasso
-% Dimensioni: (Tempo x Orizzonte_IRF)
-%Store_IRF_HICP = zeros(n_windows, H);
-%Store_IRF_GDP = zeros(n_windows, H);
-%
-%Time_Axis = zeros(n_windows, 1);
-
-% CICLO ROLLING
-%for i = 1:n_windows
-%    i
-    % 1. Definisci gli indici temporali della finestra corrente
-%    idx_start = i;
-%    idx_end = i + window_size - 1;
-    
-%    % 2. Seleziona i dati per questa finestra
-%    % Nota: I fattori F sono già estratti globalmente (metodo standard Bernanke)
-%    F_window = Fhat_shadowrate(idx_start:idx_end, :);
-%    Y_window = [Y(idx_start:idx_end, [1,2]),shadowrate(idx_start:idx_end, :)];
-    
-    % 3. Stima il VAR sulla finestra
-    % (Qui chiami la tua funzione che calcola il VAR e le IRF)
-    % [IRF_out] = calcola_var_irf(F_window, Y_window, ...);
-%    rolling_Z=[F_window Y_window];
-%    rolling_favar_labels=[1:r, "GDP","HICP","Policy Rate"];
-
-%       [rolling_favar_irf,~,rolling_favar_irf_boot,~,~,~] = CholeskyIdentification(rolling_Z,optimal_p,H,constant,2,cum_index,rolling_favar_labels,0);
- 
- 
-    
-    
-    % 4. Salva la IRF di interesse (es. GDP response to Rate Shock)
-%    irf_gdp_rate = rolling_favar_irf(r+1, r+3, :); 
-%    irf_hicp_rate = rolling_favar_irf(r+2, r+3, :); 
-%    
-%   irf_gdp_rate=cumsum(irf_gdp_rate,3);
-%    Store_IRF_GDP(i, :) = squeeze(irf_gdp_rate);
-%
-%   irf_hicp_rate=cumsum(irf_hicp_rate,3);
-%    Store_IRF_HICP(i, :) = squeeze(irf_hicp_rate);
-    
-    % Salviamo la data centrale o finale della finestra per il grafico
-%    Time_Axis(i) = t(idx_end); 
-%end
-
-% 5. PLOT 3D (Surface Plot) - Molto scenografico
-%figure;
-
-%surf(1:H, Time_Axis, Store_IRF_GDP);
-%title('Evoluzione temporale della risposta del PIL allo shock Tasso');
-%xlabel('Orizzonte IRF (mesi)');
-%ylabel('Tempo (Fine finestra)');
-%zlabel('Risposta (%)');
-%shading interp; view(-15, 30);

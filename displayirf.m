@@ -1,4 +1,4 @@
-function [disp_irf,disp_irf_boot]=displayirf(irf,irfboot,rows,columns,labels,shocklabels,n_figure)
+function [disp_irf,disp_irf_boot]=displayirf(irf,irfboot,rows,columns,labels,shocklabels,n_figure,confidence)
 
 disp_irf=irf(rows,columns,:);
 disp_irf_boot=irfboot(rows,columns,:,:);
@@ -15,7 +15,7 @@ k=0;
             subplot(n_rows,n_columns,k),
             plot(1:H,squeeze(disp_irf(i,j,:)),'k',...
             1:H,squeeze(prctile(disp_irf_boot(i,j,:,:), ...
-            [16 84],4)),':k'),axis tight
+            confidence,4)),':k'),axis tight
 
             if i==1, title(['Shock: ',shocklabels(j)]); end
             if j==1, ylabel(labels(i)); end
