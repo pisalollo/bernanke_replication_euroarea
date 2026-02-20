@@ -35,9 +35,8 @@ The code computes IRFs for both the variables included in the VAR and the "loade
 
 ## Repository Structure
 - `finale.m`: The primary script to run the analysis, from data loading to plot generation.
-- `bernanke_cleaning.m`: Function for extracting factors orthogonal to the policy rate.
+- `bernanke_cleaning.m` or 'bernanke_rotation.m': Function for extracting factors orthogonal to the policy rate.
 - `CholeskyIdentification.m`: Core econometric routine for structural shock identification.
-- `irf_loading.m`: Maps factor IRFs back to the 100+ observed variables.
 - `optimal_r.m`: Selects the optimal number of factors based on variance explained.
 
 ## How to Run
