@@ -6,7 +6,7 @@ This repository contains a full-scale replication and extension of the **Factor-
 The project applies this framework to the **Euro Area**, using a high-dimensional dataset to investigate how ECB monetary policy shocks propagate through a wide array of macroeconomic variables. Unlike standard VAR models, which are limited by the "curse of dimensionality," the FAVAR approach allows for a more comprehensive information set, mitigating the "price puzzle" and providing a richer description of the transmission mechanism.
 
 ## Key Features
-- **High-Dimensional Dataset:** Processing and standardization of 100+ macroeconomic time series (Monthly, 2000–2025).
+- **High-Dimensional Dataset:** Processing and standardization of 100+ macroeconomic time series (Monthly, 2000-2025).
 - **Factor Extraction & Identification:** - Dimensionality reduction via **Principal Component Analysis (PCA)**.
     - Implementation of **"Bernanke Cleaning"** to ensure the separation of latent factors from observed policy variables, dividing "Slow" and "Fast" variables.
     - Recursive identification (**Cholesky Decomposition**) and support for **Sign Restrictions**(to be implemented).
