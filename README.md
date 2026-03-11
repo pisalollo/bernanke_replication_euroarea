@@ -34,7 +34,7 @@ The code computes IRFs for both the variables included in the VAR and the "loade
 - Exchange Rates and Sentiment Indices (CCI/BCI)
 
 ## Repository Structure
-- `finale.m`: The primary script to run the analysis, from data loading to plot generation.
+- `main`: The primary script to run the analysis, from data loading to plot generation.
 - `bernanke_cleaning.m` or 'bernanke_rotation.m': Function for extracting factors orthogonal to the policy rate.
 - `CholeskyIdentification.m`: Core econometric routine for structural shock identification.
 - `optimal_r.m`: Selects the optimal number of factors based on variance explained.
@@ -42,7 +42,7 @@ The code computes IRFs for both the variables included in the VAR and the "loade
 ## How to Run
 1. Ensure you have **MATLAB** installed with the *Econometrics Toolbox*.
 2. Clone the repository.
-3. Run `finale.m`.
+3. Run `main`.
 
 ## Results
 The model successfully identifies the transmission of monetary policy, showing a hump-shaped response of output and a gradual decline in price levels following a contractionary shock, consistent with economic theory and ECB's historical data.
