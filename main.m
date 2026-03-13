@@ -5,6 +5,8 @@
 
 clear all;
 close all;
+addpath(genpath(fullfile(pwd, 'functions')))
+
 %confidence=[16 84]; %set confidence to 68
 confidence=[5 95]; %set confidence to 90
 %n_bootstrap = 10000;
@@ -171,7 +173,7 @@ p_max = 12;
 if forcing
     if forced_p>=1
         optimal_p=forced_p; %forcing p to >=7 to capture reasonable seasonality
-        [para_optimalp,res_optimalp]=VARTopicsOLS(Z,optimal_p);
+        [para_optimalp,res_optimalp]=VarOLS(Z,optimal_p);
     end
     optimal_p_shadowrate=optimal_p;
     optimal_p_baseline=optimal_p;
@@ -430,7 +432,7 @@ return
 %  HISTORICAL DECOMPOSITION(WIP)
 %% ============================================================
 
-[para_hd, res_hd] = VARTopicsOLS(Z, optimal_p);
+[para_hd, res_hd] = VarOLS(Z, optimal_p);
 [HD_favar, baseline_favar] = historical_decomposition(Z, para_hd, res_hd, optimal_p);
 
 shock_idx = r + 3;   % policy rate shock (ultimo in Z)

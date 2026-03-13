@@ -1,5 +1,5 @@
 %VAR OLS estimation of AR(p)
-function [para,res]=VARTopicsOLS(data,p)
+function [para,res]=VarOLS(data,p)
 y=data(p+1:end,:);
 T=size(y,1);
 X=ones(T,1);
