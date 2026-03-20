@@ -28,7 +28,7 @@ The project estimates five model variants and compares their impulse response fu
 - **Coverage:** Monthly, January 2000 – November 2025 (~311 observations)
 - **Dimensionality:** ~119 macroeconomic time series for the Euro Area
 - **Explicit variables (Y block):** Real GDP (col. 1), HICP (col. 98), 3-Month Policy Rate (col. 75)
-- **Shadow Rate:** `data/shadowrate_spliced.mat` — (spliced after August 2022) used to handle the Zero Lower Bound (ZLB) period and unconventional monetary policy: https://sites.google.com/view/jingcynthiawu/shadow-rates
+- **Wu-Xia Shadow Rate\*:** `data/shadowrate_spliced.mat` — (spliced after August 2022) used to handle the Zero Lower Bound (ZLB) period and unconventional monetary policy: https://sites.google.com/view/jingcynthiawu/shadow-rates
 
 ### Fast vs. Slow Variables
 
@@ -144,6 +144,32 @@ Results are consistent with standard monetary transmission theory and ECB histor
 
 - [ ] **Historical Decomposition** — code is drafted and commented out at the bottom of `main.m`
 - [ ] **Sign Restrictions** identification (alternative to Cholesky)
+
+---
+
+## Note
+
+**Note on the Euro Area Shadow Rate**
+
+This project uses the Wu & Xia (2016) shadow rate for the Euro Area
+as a proxy for the monetary policy stance beyond the zero lower bound.
+However, the EA shadow rate exhibits values reaching approximately -8%
+during the negative interest rate policy (NIRP) period (2014–2022),
+while the 3-month Euribor bottomed at around -0.5%.
+
+This divergence raises concerns about the interpretability of the
+shadow rate in the EA context. Unlike the US case — where the shadow
+rate remains within a plausible range (-3% at trough) and cleanly
+converges to the Fed funds rate upon lift-off — the EA shadow rate
+appears to reflect model-implied extrapolation rather than an
+economically meaningful measure of stance during the NIRP regime.
+
+Following the authors' own recommendation, the spliced series
+(shadow rate pre-ZLB exit, Euribor post-ZLB exit) is used in the
+baseline specification. Results should be interpreted with caution. Alternative specifications using the
+Euribor throughout are reported in the robustness checks.
+
+**Current status: alternative measures under review**
 
 ---
 
