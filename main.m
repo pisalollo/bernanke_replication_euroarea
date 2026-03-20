@@ -22,11 +22,11 @@ tic
 %% ============================================================
 
 % Read variable names from Excel (first row)
-varNames = string(readcell("EAdata2.xlsx","Range","B1:DO1"));
+varNames = string(readcell("data/EAdata2.xlsx","Range","B1:DO1"));
 varNames_baseline = varNames;
 
 % Read data matrix
-EAdata = readmatrix("EAdata2.xlsx","Range","B3:DO313");
+EAdata = readmatrix("data/EAdata2.xlsx","Range","B3:DO313");
 
 % Monthly time index
 t = datetime(2000,1,1):calmonths(1):datetime(2025,11,1);
@@ -110,7 +110,7 @@ X_s_baseline = X_std_baseline(:,~is_fast_baseline);
 %% ============================================================
 
 % Load and standardize shadow policy rate
-shadowrate = cell2mat(struct2cell(load("shadowrate_spliced.mat")));
+shadowrate = cell2mat(struct2cell(load("data/shadowrate_spliced.mat")));
 shadowrate = zscore(shadowrate);
 
 %% ============================================================
