@@ -9,7 +9,7 @@ T=size(y,1);
 for p=1:p_max
     
     
-    [para,res]=VARTopicsOLS(y,p);
+    [para,res]=VarOLS(y,p);
     sigma = cov(res);
     log_sigma = log(det(sigma));
     aic_values(p) = log_sigma +2*(n^2*p+n) / T;

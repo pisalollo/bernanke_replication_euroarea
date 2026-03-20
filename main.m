@@ -5,7 +5,7 @@
 
 clear all;
 close all;
-addpath(genpath(fullfile(pwd, 'functions')))
+addpath(genpath(fullfile(pwd)))
 
 %confidence=[16 84]; %set confidence to 68
 confidence=[5 95]; %set confidence to 90
