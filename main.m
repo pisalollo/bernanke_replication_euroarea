@@ -180,41 +180,36 @@ constant = 1;
 cum_index = [];
 display_on = 0;
 
+
 % Main FAVAR
-favar_labels=[1:r, "GDP","HICP","Policy Rate"];
-[favar_irf,~,favar_irf_boot,~,~,~] = CholeskyIdentification(Z,optimal_p,H,constant,n_bootstrap,cum_index,favar_labels,display_on);
-
 % Standard VAR
-var_labels=["GDP","HICP","Policy Rate"];
-[var_irf,~,var_irf_boot,~,~,~] = CholeskyIdentification(Y,optimal_p_var,H,constant,n_bootstrap,cum_index,var_labels,display_on);
-
 % Baseline FAVAR
-favar_baseline_labels=[1:r_baseline,"Policy Rate"];
-[favar_baseline_irf,~,favar_baseline_irf_boot,~,~,~] = CholeskyIdentification(Z_baseline,optimal_p_baseline,H,constant,n_bootstrap,cum_index,favar_baseline_labels,display_on);
-
 % Shadow rate Baseline
-favar_baseline_shadow_labels=[1:r_baseline,"Shadow Rate"];
-[favar_bs_sh_irf,~,favar_bl_sh_irf_boot,~,~,~] = CholeskyIdentification(Z_baseline_shadow,optimal_p_baseline_shadowrate,H,constant,n_bootstrap,cum_index,favar_baseline_shadow_labels,display_on);
-
 % Shadow rate (Main variant)
-favar_shadow_labels=[1:r,"GDP","HICP","Shadow Rate"];
-[favar_shadow_irf,~,favar_shadow_irf_boot,~,~,~] = CholeskyIdentification(Z_shadow,optimal_p_shadowrate,H,constant,n_bootstrap,cum_index,favar_shadow_labels,display_on);
 
-%% ============================================================
-%  LOADINGS: MAP FACTOR IRFs TO OBSERVED VARIABLES
-%% ============================================================
+[favar_irf,          ~, favar_irf_boot,          ~, ~, ~] = CholeskyIdentification(Z,                 optimal_p,                H, constant, n_bootstrap, cum_index, [string(1:r), "GDP","HICP","Policy Rate"],    display_on);
+[var_irf,            ~, var_irf_boot,            ~, ~, ~] = CholeskyIdentification(Y,                 optimal_p_var,            H, constant, n_bootstrap, cum_index, ["GDP","HICP","Policy Rate"],                  display_on);
+[favar_baseline_irf, ~, favar_baseline_irf_boot, ~, ~, ~] = CholeskyIdentification(Z_baseline,        optimal_p_baseline,       H, constant, n_bootstrap, cum_index, [string(1:r_baseline), "Policy Rate"],         display_on);
+[favar_bl_sh_irf,    ~, favar_bl_sh_irf_boot,    ~, ~, ~] = CholeskyIdentification(Z_baseline_shadow, optimal_p_baseline_shadowrate, H, constant, n_bootstrap, cum_index, [string(1:r_baseline), "Shadow Rate"],        display_on);
+[favar_shadow_irf,   ~, favar_shadow_irf_boot,   ~, ~, ~] = CholeskyIdentification(Z_shadow,          optimal_p_shadowrate,         H, constant, n_bootstrap, cum_index, [string(1:r), "GDP","HICP","Shadow Rate"],     display_on);
 
-index_favar_slow = find(~is_fast);
-[IRF_loaded_favar, IRF_loaded_boot_favar,~]=irf_loading(X_std,Z,sigma,favar_irf,favar_irf_boot,index_favar_slow,r+3);
-[IRF_loaded_favar_shadowrate, IRF_loaded_boot_favar_shadowrate,~]=irf_loading(X_std,Z_shadow,sigma,favar_shadow_irf,favar_shadow_irf_boot,index_favar_slow,r+1);
+var_labels = ["GDP", "HICP", "Policy Rate"];
 
-index_baseline_slow = find(~is_fast_baseline);
-[IRF_loaded_favar_baseline, IRF_loaded_boot_favar_baseline,~]=irf_loading(X_std_baseline,Z_baseline,sigma_baseline,favar_baseline_irf,favar_baseline_irf_boot,index_baseline_slow,r_baseline+1);
-[IRF_loaded_favar_baseline_shadowrate, IRF_loaded_boot_favar_baseline_shadowrate,~]=irf_loading(X_std_baseline,Z_baseline_shadow,sigma_baseline,favar_bs_sh_irf,favar_bl_sh_irf_boot,index_baseline_slow,r_baseline+1);
+% =========================================================================
+%  10. IRF LOADING (factor IRFs → observed variables) (wip: goal: more compact code)
+% =========================================================================
 
-%% ============================================================
-%  CUMULATIVE IMPULSE RESPONSES
-%% ============================================================
+idx_favar_slow = find(~is_fast);
+idx_baseline_slow = find(~is_fast_baseline);
+
+[IRF_loaded_favar, IRF_loaded_boot_favar,~]=irf_loading(X_std,Z,sigma,favar_irf,favar_irf_boot,idx_favar_slow,r+3);
+[IRF_loaded_favar_shadowrate, IRF_loaded_boot_favar_shadowrate,~]=irf_loading(X_std,Z_shadow,sigma,favar_shadow_irf,favar_shadow_irf_boot,idx_favar_slow,r+1);
+[IRF_loaded_favar_baseline, IRF_loaded_boot_favar_baseline,~]=irf_loading(X_std_baseline,Z_baseline,sigma_baseline,favar_baseline_irf,favar_baseline_irf_boot,idx_baseline_slow,r_baseline+1);
+[IRF_loaded_favar_baseline_shadowrate, IRF_loaded_boot_favar_baseline_shadowrate,~]=irf_loading(X_std_baseline,Z_baseline_shadow,sigma_baseline,favar_bl_sh_irf,favar_bl_sh_irf_boot,idx_baseline_slow,r_baseline+1);
+
+% =========================================================================
+%  11. CUMULATIVE IRFs (wip: goal: more compact code)
+% =========================================================================
 
 %var con gdp, hicp, policy rate
 cum_index=[1,2];
@@ -236,18 +231,37 @@ baselineirfboot=[IRF_loaded_boot_favar_baseline([1,97],r_baseline+1,:,:);favar_b
 
 %favar baseline shadowrate
 cum_index=[1,2];
-baseline_shadowirf=[IRF_loaded_favar_baseline_shadowrate([1,97],r_baseline+1,:);favar_bs_sh_irf(r_baseline+1,r_baseline+1,:)];
+baseline_shadowirf=[IRF_loaded_favar_baseline_shadowrate([1,97],r_baseline+1,:);favar_bl_sh_irf(r_baseline+1,r_baseline+1,:)];
 baseline_shadowirfboot=[IRF_loaded_boot_favar_baseline_shadowrate([1,97],r_baseline+1,:,:);favar_bl_sh_irf_boot(r_baseline+1,r_baseline+1,:,:)];
 [cumulative_favar_baseline_shadow_irf, cumulative_baseline_favar_shadow_irf_boot]=cumulative_irf(baseline_shadowirf,baseline_shadowirfboot,cum_index);
 
+% =========================================================================
+%  12. MODEL COMPARISON PLOT (VAR vs all FAVAR variants) (wip: goal: more compact code)
+% =========================================================================
 
-% preapring cells to compare irf models and display
-%irf_s={cumulative_favar_irf([r+1:r+3],r+3,:),cumulative_var_irf(:,3,:),cumulative_favar_baseline_irf,cumulative_favar_baseline_shadow_irf,cumulative_favar_shadow_irf([r+1:r+3],r+3,:)};
-%irf_boot_s={cumulative_favar_irf_boot([r+1:r+3],r+3,:,:),cumulative_var_irf_boot(:,3,:,:),cumulative_favar_baseline_irf_boot,cumulative_baseline_favar_shadow_irf_boot,cumulative_favar_shadow_irf_boot([r+1:r+3],r+3,:,:)};
 
+% Collect policy-rate shock IRFs for GDP, HICP, Rate across models
+% Order:
+%
+% Standard VAR
+%
+% Main FAVAR
+% Baseline FAVAR
+%
+% Shadow rate (Main variant)
+% Shadow rate Baseline
 
-irf_s={cumulative_var_irf(:,3,:),cumulative_favar_irf([r+1:r+3],r+3,:),cumulative_favar_baseline_irf,cumulative_favar_shadow_irf([r+1:r+3],r+3,:),cumulative_favar_baseline_shadow_irf};
-irf_boot_s={cumulative_var_irf_boot(:,3,:,:),cumulative_favar_irf_boot([r+1:r+3],r+3,:,:),cumulative_favar_baseline_irf_boot,cumulative_favar_shadow_irf_boot([r+1:r+3],r+3,:,:),cumulative_baseline_favar_shadow_irf_boot};
+irf_s={cumulative_var_irf(:,3,:),...
+    cumulative_favar_irf([r+1:r+3],r+3,:),...
+    cumulative_favar_baseline_irf,...
+    cumulative_favar_shadow_irf([r+1:r+3],r+3,:),...
+    cumulative_favar_baseline_shadow_irf};
+
+irf_boot_s={cumulative_var_irf_boot(:,3,:,:),...
+    cumulative_favar_irf_boot([r+1:r+3],r+3,:,:),...
+    cumulative_favar_baseline_irf_boot,...
+    cumulative_favar_shadow_irf_boot([r+1:r+3],r+3,:,:),...
+    cumulative_baseline_favar_shadow_irf_boot};
 
 
 irf_s{1}(:,1,:)=irf_s{1}(:,1,:).*sigma_Y';
@@ -276,8 +290,8 @@ irf_s{5}([1,2],1,:)=irf_s{5}([1,2],1,:)*100;
 irf_boot_s{5}([1,2],1,:,:)=irf_boot_s{5}([1,2],1,:,:)*100;
 
 %dispplay comparison
-compare_irf(irf_s,irf_boot_s,var_labels,"Policy Rate shock VAR vs FAVAR (baseline) vs FAVAR(ibrido) vs FAVAR (shadow) vs FAVAR(ibrido e shadow): livelli", ...
-    ["VAR","FAVAR[r+GDP,HICP,PolicyRate","Favar Baseline","Favar Shadow", "Favar baseline shadow"],0,confidence);
+model_legends = ["VAR", "FAVAR", "FAVAR Baseline", "FAVAR Shadow", "FAVAR Baseline Shadow"];
+compare_irf(irf_s, irf_boot_s, var_labels, "Policy Rate Shock", model_legends, 0, confidence);
 
 % =========================================================================
 %  13. ROBUSTNESS: IRFs ACROSS DIFFERENT NUMBER OF FACTORS
