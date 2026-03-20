@@ -283,28 +283,29 @@ compare_irf(irf_s,irf_boot_s,var_labels,"Policy Rate shock VAR vs FAVAR (baselin
 %  13. ROBUSTNESS: IRFs ACROSS DIFFERENT NUMBER OF FACTORS
 % =========================================================================
 
-irf_s_r      = {};
-irf_boot_s_r = {};
+irf_s_r={};
+irf_s_boot_r={};
 
-for i = 1:r
-    F_r   = bernanke_cleaning(i, X_std, X_slow, policy_rate);
-    Z_r   = [F_r, Y];
-    [irf_r, ~, irf_boot_r, ~, ~, ~] = CholeskyIdentification(Z_r, optimal_p, H, constant, n_bootstrap, [], "", 0);
-    [cum_r, cum_boot_r] = cumulative_irf(irf_r, irf_boot_r, [i+1, i+2]);
+for i=1:r
+    [F_r]= bernanke_cleaning(i,X_std,X_slow,policy_rate);
+    Z_r = [F_r Y];
 
-    irf_s_r{i}      = cum_r(i+1:i+3,    i+3, :)    .* sigma_Y';
-    irf_boot_s_r{i} = cum_boot_r(i+1:i+3, i+3, :, :) .* sigma_Y';
-    irf_s_r{i}([1,2], :, :)         = irf_s_r{i}([1,2], :, :)         * 100;
-    irf_boot_s_r{i}([1,2], :, :, :) = irf_boot_s_r{i}([1,2], :, :, :) * 100;
+    [favar_irf_r,~,favar_irf_boot_r,~,~,~] = CholeskyIdentification(Z_r,optimal_p,H,constant,n_bootstrap,[],"",0);
+    [cumulative_favar_irf_r, cumulative_favar_irf_boot_r]=cumulative_irf(favar_irf_r,favar_irf_boot_r,[i+1,i+2]);
+    
+    irf_s_r{i}=cumulative_favar_irf_r(i+1:i+3,i+3,:).*sigma_Y';
+    irf_s_boot_r{i}=cumulative_favar_irf_boot_r(i+1:i+3,i+3,:,:).*sigma_Y';
+    
+    irf_s_r{i}([1,2],:,:)=irf_s_r{i}([1,2],:,:)*100;
+    irf_s_boot_r{i}([1,2],:,:,:)=irf_s_boot_r{i}([1,2],:,:,:)*100;
 end
 
-compare_irf(irf_s_r, irf_boot_s_r, var_labels, ...
-    "FAVAR – Robustness: varying number of factors", ...
-    [string(1+3 : r+3-1), "Optimal r"], 0, confidence);
+%displaying
+compare_irf(irf_s_r,irf_s_boot_r,var_labels,"Favar comparison - various r: from 1 factor + 3 (gdp,hicp,rate) to the optimal computed ( minus the varaibile made explicit)- livelli",[1+3:r+3-1,"optimal R"],0,confidence);
 
-% =========================================================================
-%  14. MAIN IRF DISPLAY (loaded variables)
-% =========================================================================
+%% ============================================================
+%  DISPLAYING LOADED IRF MAIN FAVAR
+%% ============================================================
 
 %FFR - IRT3M 
 %IP - GDP - cum - 2
@@ -348,20 +349,30 @@ cum_disp_irf(cum_disp_x100_idx,:,:)=cum_disp_irf(cum_disp_x100_idx,:,:)*100;
 cum_disp_irf_boot(cum_disp_x100_idx,:,:,:)=cum_disp_irf_boot(cum_disp_x100_idx,:,:,:)*100;
 
 
-% Plot
-x = (1:H)';
-figure
-for i = 1:length(labels_disp)
-    subplot(4, 4, i)
-    band  = squeeze(prctile(cum_disp_irf_boot(i, r+3, :, :), confidence, 4));
-    lower = band(:, 1);
-    upper = band(:, 2);
-    fill([x; flipud(x)], [upper; flipud(lower)], 'b', 'FaceAlpha', 0.2, 'EdgeColor', 'none')
+H=size(disp_irf,3);
+x = 1:H;
+x=x(:);
+
+figure()
+for i=1:max(size(labels_disp))
+    subplot(4,4,i),
+    band = squeeze(prctile(cum_disp_irf_boot(i,r+3,:,:), confidence, 4)); 
+    lower = squeeze(band(:,1));
+    upper = squeeze(band(:,2));
+    lower=lower(:);
+    upper=upper(:);
+    x_area = [x; flipud(x)];          
+    y_area = [upper; flipud(lower)];
+    plot(1:H,squeeze(cum_disp_irf(i,r+3,:)),'b')
     hold on
-    plot(1:H, squeeze(cum_disp_irf(i, r+3, :)), 'b')
-    yline(0, 'r--', 'HandleVisibility', 'off')
-    axis tight; hold off
+    Patch = fill(x_area, y_area,'b', 'FaceAlpha', 0.2, 'EdgeColor', 'none');
+
+    yline(0,'r--','HandleVisibility','off')
+    axis tight
+    hold off
+    
     title(labels_disp(i))
+
 end
 
 % =========================================================================
