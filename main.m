@@ -180,7 +180,6 @@ constant = 1;
 cum_index = [];
 display_on = 0;
 
-
 % Main FAVAR
 % Standard VAR
 % Baseline FAVAR
@@ -303,6 +302,7 @@ irf_boot_s_r = {};
 for i = 1:r
     F_r   = bernanke_cleaning(i, X_std, X_slow, policy_rate);
     Z_r   = [F_r, Y];
+
     [irf_r, ~, irf_boot_r, ~, ~, ~] = CholeskyIdentification(Z_r, optimal_p, H, constant, n_bootstrap, [], "", 0);
     [cum_r, cum_boot_r] = cumulative_irf(irf_r, irf_boot_r, [i+1, i+2]);
 
