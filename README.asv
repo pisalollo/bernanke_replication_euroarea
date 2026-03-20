@@ -83,21 +83,19 @@ Structural shocks are identified via **Cholesky decomposition** of the residual 
 ```
 ├── main.m                      # Main script: data → estimation → IRFs → diagnostics
 │
-├── CholeskyIdentification.m# VAR estimation, Cholesky IRFs, bootstrap
-├── optimal_r.m             # Scree plot + optimal number of factors (variance criterion)
-├── get_indices.m           # Maps variable tickers to column indices in the dataset
-├── calc_favar_r2.m         # R² of factor model for each observed variable
-├── calc_favar_fevd.m       # Forecast Error Variance Decomposition
-│
 ├── bernanke_cleaning/
 │   ├── bernanke_cleaning.m     # Bernanke rotation with intercept (Fhat orthogonal to rate)
 │   └── bernanke_rotation.m     # Bernanke rotation without intercept (alternative)
+
 ├── irf tools/
 │   ├── irf_loading.m           # Projects factor IRFs onto observed variables via Lambda
 │   ├── normalize_irfToTarget.m # Rescales IRFs to a target shock size (e.g. 25 bps)
 │   ├── cumulative_irf.m        # Cumulates IRFs for selected variables (e.g. GDP, HICP)
 │   ├── displayirf.m            # Plots IRF subpanels with bootstrap bands
-│   └── compare_irf.m           # Overlays IRFs from multiple model variants
+│   ├── compare_irf.m           # Overlays IRFs from multiple model variants
+│   ├── get_indices.m           # Maps variable tickers to column indices in the dataset
+│   ├── calc_favar_r2.m         # R² of factor model for each observed variable
+│   └── calc_favar_fevd.m       # Forecast Error Variance Decomposition
 │
 └── data/
     ├── EAdata2.xlsx            # Main dataset (100+ Euro Area monthly series)
