@@ -24,11 +24,11 @@ The project estimates five model variants and compares their impulse response fu
 
 ## Dataset
 
-- **Source:** `data/EAdata2.xlsx`
+- **Source:** `data/EAdata2.xlsx`: https://sites.google.com/view/jingcynthiawu/shadow-rates
 - **Coverage:** Monthly, January 2000 – November 2025 (~311 observations)
 - **Dimensionality:** ~119 macroeconomic time series for the Euro Area
 - **Explicit variables (Y block):** Real GDP (col. 1), HICP (col. 98), 3-Month Policy Rate (col. 75)
-- **Shadow Rate:** `data/shadowrate_spliced.mat` — used to handle the Zero Lower Bound (ZLB) period and unconventional monetary policy
+- **Shadow Rate:** `data/shadowrate_spliced.mat` — (spliced after August 2022) used to handle the Zero Lower Bound (ZLB) period and unconventional monetary policy: https://sites.google.com/view/jingcynthiawu/shadow-rates
 
 ### Fast vs. Slow Variables
 
