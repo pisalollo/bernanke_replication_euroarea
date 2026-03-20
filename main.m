@@ -37,23 +37,6 @@ X_std_baseline    = X_std;
 sigma          = std(X_raw, 'omitnan');
 sigma_baseline = sigma;
 
-
-%% ============================================================
-%  EXPLICIT VARIABLES (Y block)
-% ============================================================
-
-% Explicit macro variables:
-% 1 = GDP
-% 98 = HICP overall
-% 75 = 3M policy rate
-Y = X_std(:,[1,98,75]);
-
-% Remove sample mean
-Y = Y - mean(Y,'omitnan');
-
-% Standard deviations of explicit variables
-sigma_Y = sigma([1,98,75]);
-
 % =========================================================================
 %  2. EXPLICIT VARIABLES (Y block: GDP, HICP, Policy Rate)
 % =========================================================================
