@@ -1,4 +1,5 @@
 function [HD, baseline] = historical_decomposition(Z, para, res, p)
+%WIP
 % HISTORICAL_DECOMPOSITION (WIP)
 % para: [(1 + n*p) x n] matrix from VARTopicsOLS
 %       row 1       = constants

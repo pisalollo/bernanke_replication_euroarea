@@ -431,111 +431,111 @@ return
 %% ============================================================
 %  HISTORICAL DECOMPOSITION(WIP)
 %% ============================================================
-
-[para_hd, res_hd] = VarOLS(Z, optimal_p);
-[HD_favar, baseline_favar] = historical_decomposition(Z, para_hd, res_hd, optimal_p);
-
-shock_idx = r + 3;   % policy rate shock (ultimo in Z)
-t_hd = t(optimal_p+1:end);
-
-% Rescale: standardized -> unità originali
-HD_gdp  = squeeze(HD_favar(r+1, shock_idx, optimal_p+1:end)) * sigma_Y(1) * 100;
-HD_hicp = squeeze(HD_favar(r+2, shock_idx, optimal_p+1:end)) * sigma_Y(2) * 100;
-HD_rate = squeeze(HD_favar(r+3, shock_idx, optimal_p+1:end)) * sigma_Y(3);
-
-% Plot
-figure('Name','HD – Contributo shock di politica monetaria')
-titles_hd = ["GDP (p.p.)", "HICP (p.p.)", "Policy Rate (std)"];
-hd_series = {HD_gdp, HD_hicp, HD_rate};
-colors = {[0.2 0.4 0.8],[0.8 0.2 0.2],[0.2 0.7 0.3]};
-
-for i = 1:3
-    subplot(3,1,i)
-    bar(t_hd, hd_series{i}, 'FaceColor', colors{i}, 'EdgeColor','none')
-    yline(0,'k-','LineWidth',1)
-    title(titles_hd(i))
-    axis tight
-end
-sgtitle('Historical Decomposition – Shock di Politica Monetaria')
-
-%% ============================================================
-%  HD – STACKED BAR: TUTTI GLI SHOCK (WIP)
-%% ============================================================
-
-shock_labels = [arrayfun(@(x) "Factor "+x, 1:r, 'UniformOutput',false), ...
-                "GDP shock", "HICP shock", "Rate shock"];
-shock_labels = string(shock_labels);
-
-vars_to_plot = struct();
-vars_to_plot(1).name   = "GDP";
-vars_to_plot(1).idx    = r+1;
-vars_to_plot(1).scale  = sigma_Y(1)*100;
-vars_to_plot(1).ylabel = "p.p. contribution";
-
-vars_to_plot(2).name   = "HICP";
-vars_to_plot(2).idx    = r+2;
-vars_to_plot(2).scale  = sigma_Y(2)*100;
-vars_to_plot(2).ylabel = "p.p. contribution";
-
-vars_to_plot(3).name   = "Policy Rate";
-vars_to_plot(3).idx    = r+3;
-vars_to_plot(3).scale  = sigma_Y(3);
-vars_to_plot(3).ylabel = "std. dev. contribution";
-
-% Colori: fattori in grigio, ultimi 3 in colori
-colors_shocks = [repmat([0.75 0.75 0.75], r, 1);
-                 0.2 0.5 0.8;
-                 0.8 0.3 0.2;
-                 0.2 0.7 0.3];
-
-figure('Name','HD – All Shocks Stacked','Position',[100 100 1200 900])
-
-for v = 1:3
-    var_idx = vars_to_plot(v).idx;
-    scale   = vars_to_plot(v).scale;
-
-    % [T_hd x n_shocks]
-    HD_all = squeeze(HD_favar(var_idx, :, optimal_p+1:end))' * scale;
-
-    % Deviazione osservata dalla baseline
-    observed  = Z(optimal_p+1:end, var_idx) * scale;
-    baseline_v = baseline_favar(var_idx, optimal_p+1:end)' * scale;
-    deviation  = observed - baseline_v;
-
-    % ---- Separa positivi e negativi ----
-    HD_pos = max(HD_all, 0);   % [T_hd x n_shocks]
-    HD_neg = min(HD_all, 0);
-
-    subplot(3,1,v)
-    hold on
-
-    % Un unico bar() per i positivi con matrice → MATLAB fa stacking corretto
-    b_pos = bar(t_hd, HD_pos, 'stacked', 'EdgeColor','none', 'BarWidth',1);
-    b_neg = bar(t_hd, HD_neg, 'stacked', 'EdgeColor','none', 'BarWidth',1);
-
-    % Applica colori
-    for j = 1:length(b_pos)
-        b_pos(j).FaceColor = colors_shocks(j,:);
-        b_neg(j).FaceColor = colors_shocks(j,:);
-        % Nascondi b_neg dalla legenda (duplicato)
-        b_neg(j).HandleVisibility = 'off';
-    end
-
-    % Linea osservato
-    plot(t_hd, deviation, 'k-', 'LineWidth', 1.8, 'DisplayName','Observed deviation')
-    yline(0,'k--','LineWidth',0.8,'HandleVisibility','off')
-
-    axis tight
-    title(vars_to_plot(v).name)
-    ylabel(vars_to_plot(v).ylabel)
-
-    if v == 1
-        legend([b_pos, plot(NaN,NaN,'k-','LineWidth',1.5)], ...
-               [shock_labels, "Observed deviation"], ...
-               'Location','northeastoutside','FontSize',7)
-    end
-
-    hold off
-end
-
-sgtitle('Historical Decomposition – All Structural Shocks')
+% 
+% [para_hd, res_hd] = VarOLS(Z, optimal_p);
+% [HD_favar, baseline_favar] = historical_decomposition(Z, para_hd, res_hd, optimal_p);
+% 
+% shock_idx = r + 3;   % policy rate shock (ultimo in Z)
+% t_hd = t(optimal_p+1:end);
+% 
+% % Rescale: standardized -> unità originali
+% HD_gdp  = squeeze(HD_favar(r+1, shock_idx, optimal_p+1:end)) * sigma_Y(1) * 100;
+% HD_hicp = squeeze(HD_favar(r+2, shock_idx, optimal_p+1:end)) * sigma_Y(2) * 100;
+% HD_rate = squeeze(HD_favar(r+3, shock_idx, optimal_p+1:end)) * sigma_Y(3);
+% 
+% % Plot
+% figure('Name','HD – Contributo shock di politica monetaria')
+% titles_hd = ["GDP (p.p.)", "HICP (p.p.)", "Policy Rate (std)"];
+% hd_series = {HD_gdp, HD_hicp, HD_rate};
+% colors = {[0.2 0.4 0.8],[0.8 0.2 0.2],[0.2 0.7 0.3]};
+% 
+% for i = 1:3
+%     subplot(3,1,i)
+%     bar(t_hd, hd_series{i}, 'FaceColor', colors{i}, 'EdgeColor','none')
+%     yline(0,'k-','LineWidth',1)
+%     title(titles_hd(i))
+%     axis tight
+% end
+% sgtitle('Historical Decomposition – Shock di Politica Monetaria')
+% 
+% %% ============================================================
+% %  HD – STACKED BAR: TUTTI GLI SHOCK (WIP)
+% %% ============================================================
+% 
+% shock_labels = [arrayfun(@(x) "Factor "+x, 1:r, 'UniformOutput',false), ...
+%                 "GDP shock", "HICP shock", "Rate shock"];
+% shock_labels = string(shock_labels);
+% 
+% vars_to_plot = struct();
+% vars_to_plot(1).name   = "GDP";
+% vars_to_plot(1).idx    = r+1;
+% vars_to_plot(1).scale  = sigma_Y(1)*100;
+% vars_to_plot(1).ylabel = "p.p. contribution";
+% 
+% vars_to_plot(2).name   = "HICP";
+% vars_to_plot(2).idx    = r+2;
+% vars_to_plot(2).scale  = sigma_Y(2)*100;
+% vars_to_plot(2).ylabel = "p.p. contribution";
+% 
+% vars_to_plot(3).name   = "Policy Rate";
+% vars_to_plot(3).idx    = r+3;
+% vars_to_plot(3).scale  = sigma_Y(3);
+% vars_to_plot(3).ylabel = "std. dev. contribution";
+% 
+% % Colori: fattori in grigio, ultimi 3 in colori
+% colors_shocks = [repmat([0.75 0.75 0.75], r, 1);
+%                  0.2 0.5 0.8;
+%                  0.8 0.3 0.2;
+%                  0.2 0.7 0.3];
+% 
+% figure('Name','HD – All Shocks Stacked','Position',[100 100 1200 900])
+% 
+% for v = 1:3
+%     var_idx = vars_to_plot(v).idx;
+%     scale   = vars_to_plot(v).scale;
+% 
+%     % [T_hd x n_shocks]
+%     HD_all = squeeze(HD_favar(var_idx, :, optimal_p+1:end))' * scale;
+% 
+%     % Deviazione osservata dalla baseline
+%     observed  = Z(optimal_p+1:end, var_idx) * scale;
+%     baseline_v = baseline_favar(var_idx, optimal_p+1:end)' * scale;
+%     deviation  = observed - baseline_v;
+% 
+%     % ---- Separa positivi e negativi ----
+%     HD_pos = max(HD_all, 0);   % [T_hd x n_shocks]
+%     HD_neg = min(HD_all, 0);
+% 
+%     subplot(3,1,v)
+%     hold on
+% 
+%     % Un unico bar() per i positivi con matrice → MATLAB fa stacking corretto
+%     b_pos = bar(t_hd, HD_pos, 'stacked', 'EdgeColor','none', 'BarWidth',1);
+%     b_neg = bar(t_hd, HD_neg, 'stacked', 'EdgeColor','none', 'BarWidth',1);
+% 
+%     % Applica colori
+%     for j = 1:length(b_pos)
+%         b_pos(j).FaceColor = colors_shocks(j,:);
+%         b_neg(j).FaceColor = colors_shocks(j,:);
+%         % Nascondi b_neg dalla legenda (duplicato)
+%         b_neg(j).HandleVisibility = 'off';
+%     end
+% 
+%     % Linea osservato
+%     plot(t_hd, deviation, 'k-', 'LineWidth', 1.8, 'DisplayName','Observed deviation')
+%     yline(0,'k--','LineWidth',0.8,'HandleVisibility','off')
+% 
+%     axis tight
+%     title(vars_to_plot(v).name)
+%     ylabel(vars_to_plot(v).ylabel)
+% 
+%     if v == 1
+%         legend([b_pos, plot(NaN,NaN,'k-','LineWidth',1.5)], ...
+%                [shock_labels, "Observed deviation"], ...
+%                'Location','northeastoutside','FontSize',7)
+%     end
+% 
+%     hold off
+% end
+% 
+% sgtitle('Historical Decomposition – All Structural Shocks')
