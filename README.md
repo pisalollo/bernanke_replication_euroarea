@@ -144,6 +144,7 @@ Results are consistent with standard monetary transmission theory and ECB histor
 
 - [ ] **Historical Decomposition** — code is drafted and commented out at the bottom of `main.m`
 - [ ] **Sign Restrictions** identification (alternative to Cholesky)
+- [ ] **Shadow rate** implementing a shadow rate comparison based on: https://www.ecb.europa.eu/pub/pdf/scpwps/ecbwp1991.en.pdf (extension), https://github.com/pisalollo/Euro-Area-Shadow-Rate-Term-Structure-Model-SRTSM-
 
 ---
 
