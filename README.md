@@ -172,6 +172,8 @@ Euribor throughout are reported in the robustness checks.
 
 **Current status: alternative measures under review**
 
+https://github.com/pisalollo/Euro-Area-Shadow-Rate-Term-Structure-Model-SRTSM-
+
 ---
 
 **Author:** Lorenzo Pisa  
