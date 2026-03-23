@@ -88,6 +88,9 @@ X_slow_baseline = X_std_baseline(:,~is_fast_baseline);
 shadowrate = cell2mat(struct2cell(load("data/shadowrate_spliced.mat")));
 shadowrate = zscore(shadowrate);
 
+%shadowrate = cell2mat(struct2cell(load("data/shadowrate_09_2004_to_03_2026.mat")));
+%shadowrate = zscore(shadowrate);
+
 % =========================================================================
 %  5. FACTOR SELECTION
 % =========================================================================
